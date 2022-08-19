@@ -24,17 +24,20 @@ const getAllPersons = asyncHandler( async(req,res) => {
 
 const createNewPerson = asyncHandler( async(req,res) => {
     
+    const {gender, name, surname, surnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
+    const personObj = {gender, name, surname, surnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, living, age2, deathday, deathmonth, deathyear, deathplace, info }
+    
+    const person = await Person.create(personObj);
+    if(person) {
+        res.status(201).json( {message: `New person ${name} ${surname} created`})
+    } else {
+        res.status(400).json({message: 'Invalid person data received'})
+    }
+
+
+    /* 
     const {name, surname, birthyear, birth, birthplace, birthpar, deathyear, death, deathplace, deathpar, father, mother, akt, info} = req.body
     
-    // check for duplicate 
-    // nad tym trzeba popracować !!!
-    /* 
-    "$or": [{
-        "columnA": 3
-    }, {
-        "columnB": "string"
-    }]
- */
     const duplicate = await Person.findOne({
         name: name, surname: surname, birth: birth, father: father, mother: mother 
     }).lean().exec()
@@ -51,6 +54,7 @@ const createNewPerson = asyncHandler( async(req,res) => {
     } else {
         res.status(400).json({message: 'Invalid person data received'})
     }
+     */
 })
 
 // @desc Update persons
@@ -58,7 +62,38 @@ const createNewPerson = asyncHandler( async(req,res) => {
 // @access Private
 
 const updatePerson = asyncHandler( async(req,res) => {
-    const {id, name, surname, birthyear, birth, birthplace, birthpar, deathyear, death, deathplace, deathpar, father, mother, akt, info} = req.body
+    const {id, gender, name, surname, surnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
+    
+    const person = await Person.findById(id).exec()
+    if(!person) {
+        return res.status(400).json( {message: 'Person not found'})
+    }
+    person.gender = gender
+    person.name = name
+    person.surname = surname
+    person.surnameMarried = surnameMarried
+    person.nobility = nobility
+    person.profession = profession
+    person.age = age
+    person.birthday = birthday
+    person.birthmonth = birthmonth
+    person.birthyear = birthyear
+    person.birthyeartwo = birthyeartwo
+    person.birthplace = birthplace
+    person.birthpar = birthpar
+    person.living = living
+    person.age2 = age2
+    person.deathday = deathday
+    person.deathmonth = deathmonth
+    person.deathyear = deathyear
+    person.deathplace = deathplace
+
+    person.info = info 
+
+    const updatePerson = await person.save()
+    res.json({ message: `${updatePerson.name} ${updatePerson.surname} updated`})
+    
+    /* const {id, name, surname, birthyear, birth, birthplace, birthpar, deathyear, death, deathplace, deathpar, father, mother, akt, info} = req.body
 
     const person = await Person.findById(id).exec()
     if(!person) {
@@ -91,7 +126,7 @@ const updatePerson = asyncHandler( async(req,res) => {
     
     const updatePerson = await person.save()
     res.json({ message: `${updatePerson.name} ${updatePerson.surname} updated`})
-
+ */
 })
 
 // @desc Delete a person

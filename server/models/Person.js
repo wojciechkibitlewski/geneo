@@ -1,23 +1,27 @@
 const mongoose = require('mongoose')
 
 const personSchema = new mongoose.Schema({
+
+    gender: String,
     name: String,
     surname: String,
+    surnameMarried: String,
+    nobility: String,
+    profession: String,
+    age: String,
+    birthday: Number,
+    birthmonth: Number,
     birthyear: Number,
-    birth: Date,
+    birthyeartwo: Number,
     birthplace: String,
     birthpar: String,
-    deathhyear: Number,
-    death: Date,
+    living: String,
+    age2: String,
+    deathday: Number,
+    deathmonth: Number,
+    deathyear: Number,
     deathplace: String,
-    deathpar: String,
-
-    father: String,
-    mother: String,
-    
-    akt: String,
-    info: String,
-  
+    info: String,  
 })
 
 module.exports = mongoose.model('Person', personSchema)

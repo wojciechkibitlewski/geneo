@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Axios from "axios";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -15,6 +17,7 @@ import ContactPageIcon from "@mui/icons-material/ContactPage";
 import { styled } from "@mui/material/styles";
 
 import TablePaginationActions from "./TablePaginationActions";
+
 
 TablePaginationActions.propTypes = {
   count: PropTypes.number.isRequired,
@@ -139,9 +142,23 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+const URL = process.env.REACT_APP_API_BASE_URL;
+
+const fetchHandler = async () => {
+  return await Axios.get(`${URL}persons`).then((res) => res.data);
+};
+
 const ListPersons = () => {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  
+  const [listOfPersons, setListOfPersons] = useState([]);
+  useEffect(() => {
+    fetchHandler().then((data) => setListOfPersons(data));
+  }, []);
+
+  console.log(listOfPersons)
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -155,6 +172,8 @@ const ListPersons = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+
   return (
     <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
       <Table sx={{ minWidth: 650 }} aria-label="persons table ">
