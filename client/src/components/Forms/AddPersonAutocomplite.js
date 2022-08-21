@@ -1,7 +1,11 @@
-import React from "react";
 import { useState } from "react";
 import Axios from "axios";
 import debounce from "lodash.debounce";
+
+import TextField from "@mui/material/TextField";
+
+
+
 
 const AddPersonAutocomplite = (data) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -9,9 +13,9 @@ const AddPersonAutocomplite = (data) => {
   const [suggestionsActive, setSuggestionsActive] = useState(false);
   const [value, setValue] = useState("");
   const [listOfClients, setListOfClients] = useState([]);
-  
+
   const handleChange = (e) => {
-  const query = e.target.value.toLowerCase();
+    const query = e.target.value.toLowerCase();
 
     setValue(query);
 
@@ -29,6 +33,7 @@ const AddPersonAutocomplite = (data) => {
         fetchHandler().then((data) => setListOfClients(data));
         console.log(listOfClients);
 
+
         let dataName = [];
         let dataId = [];
 
@@ -38,11 +43,15 @@ const AddPersonAutocomplite = (data) => {
           dataId.push(listOfClients[i]._id);
         }
         //////////
-
+        console.log(`data: ${dataName}`)
+        
         const filterSuggestions = dataName.filter(
           (suggestion) => suggestion.toLowerCase().indexOf(query) > -1
         );
+        
         setSuggestions(filterSuggestions);
+        
+
         setSuggestionsActive(true);
       }, 600);
       debouncedFilter();
@@ -85,6 +94,8 @@ const AddPersonAutocomplite = (data) => {
   };
 
   const Suggestions = () => {
+    console.log(`suggestions: ${suggestions}`);
+
     return (
       <ul className={data.suggestionsClassName}>
         {suggestions.map((suggestion, index) => {
@@ -104,6 +115,18 @@ const AddPersonAutocomplite = (data) => {
   };
 
   return (
+    <>
+    <TextField
+      name="fatherName"
+      fullWidth
+      id="fatherName"
+      label="Imię i nazwisko ojca"
+      onChange={ handleChange}
+    />
+
+
+
+
     <div className="autocomplete">
       <input
         type="text"
@@ -111,11 +134,11 @@ const AddPersonAutocomplite = (data) => {
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        name="clientName"
+        name="fatherName"
       />
-      <input type="hidden" value="" name="client" />
       {suggestionsActive && <Suggestions />}
     </div>
+    </>
   );
 };
 

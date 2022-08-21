@@ -24,8 +24,8 @@ const getAllPersons = asyncHandler( async(req,res) => {
 
 const createNewPerson = asyncHandler( async(req,res) => {
     
-    const {gender, name, surname, surnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
-    const personObj = {gender, name, surname, surnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, living, age2, deathday, deathmonth, deathyear, deathplace, info }
+    const {gender, name, surname, surnameMarried, fullname, fullnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, father, mother, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
+    const personObj = {gender, name, surname, surnameMarried, fullname, fullnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, father, mother, living, age2, deathday, deathmonth, deathyear, deathplace, info }
     
     const person = await Person.create(personObj);
     if(person) {
@@ -62,7 +62,7 @@ const createNewPerson = asyncHandler( async(req,res) => {
 // @access Private
 
 const updatePerson = asyncHandler( async(req,res) => {
-    const {id, gender, name, surname, surnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
+    const {id, gender, name, surname, surnameMarried, fullname, fullnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, father, mother, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
     
     const person = await Person.findById(id).exec()
     if(!person) {
@@ -72,6 +72,8 @@ const updatePerson = asyncHandler( async(req,res) => {
     person.name = name
     person.surname = surname
     person.surnameMarried = surnameMarried
+    person.fullname = fullname
+    person.fullnameMarried = fullnameMarried
     person.nobility = nobility
     person.profession = profession
     person.age = age
@@ -81,6 +83,8 @@ const updatePerson = asyncHandler( async(req,res) => {
     person.birthyeartwo = birthyeartwo
     person.birthplace = birthplace
     person.birthpar = birthpar
+    person.father = father
+    person.mother = mother
     person.living = living
     person.age2 = age2
     person.deathday = deathday
@@ -145,7 +149,7 @@ const deletePerson = asyncHandler( async(req,res) => {
         return res.status(400).json( { message: 'This person is married'})
     }
 
-    const person = await Persons.findById(id).exec()
+    const person = await Person.findById(id).exec()
 
     if(!person) {
         return res.status(400).json( {message: 'Person not found'})

@@ -27,7 +27,6 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/', require('./routers/root'));
 app.use('/persons', require('./routers/personRouters'));
 app.use('/suggest', require('./routers/suggestRouters'));
-app.use('/addfather', require('./routers/addfatherRouters'));
 
 app.all('*', (req,res) => {
     res.status(404)

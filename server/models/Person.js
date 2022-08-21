@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const AutoIncrement = require("mongoose-sequence")(mongoose);
+
 
 const personSchema = new mongoose.Schema({
 
@@ -6,6 +8,8 @@ const personSchema = new mongoose.Schema({
     name: String,
     surname: String,
     surnameMarried: String,
+    fullname: String,
+    fullnameMarried: String,
     nobility: String,
     profession: String,
     age: String,
@@ -15,6 +19,18 @@ const personSchema = new mongoose.Schema({
     birthyeartwo: Number,
     birthplace: String,
     birthpar: String,
+    fatherName: String,
+    father: {
+        type: mongoose.Schema.Types.ObjectId,
+        require: false,
+        ref: "Person",
+    },
+    motherName: String,
+    mother: {
+        type: mongoose.Schema.Types.ObjectId,
+        require: false,
+        ref: "Person",
+    },
     living: String,
     age2: String,
     deathday: Number,

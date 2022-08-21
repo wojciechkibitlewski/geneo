@@ -3,6 +3,7 @@ const router = express.Router();
 const suggestController = require('../controllers/suggestController')
 
 router.route('/:search')
-.get(suggestController.getAllSuggest)
+.get(suggestController.getSuggest)
+
 
 module.exports = router;

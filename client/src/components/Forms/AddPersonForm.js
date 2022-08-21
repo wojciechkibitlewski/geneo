@@ -1,11 +1,11 @@
 import React from "react";
 import Axios from "axios";
-import debounce from "lodash.debounce";
 
 import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
+
 import * as Yup from "yup";
 
 import Button from "@mui/material/Button";
@@ -22,41 +22,15 @@ import InputLabel from "@mui/material/InputLabel";
 import Alert from "@mui/material/Alert";
 
 import { days, months } from "../config/functions";
+import {TextFieldAutocompleteFather, TextFieldAutocompleteMother} from "./TextFieldAutocomplete"
 
 const URL = process.env.REACT_APP_API_BASE_URL;
-const URL_AUTOCOMPLETE = process.env.REACT_APP_API_AUTOCOMPLETE_URL;
 
 const AddPersonForm = () => {
   const [isAge, setAge] = useState("");
   const [isBirthday, setBirthDay] = useState("");
   const [isBirthmonth, setBirthMonth] = useState("");
   
-  const [suggestionsActive, setSuggestionsActive] = useState(false);
-  const [value, setValue] = useState("");
-  const [listOfPersons, setListOfPersons] = useState([]);
-
-  /// autocomplete
-  const handleChangeAutocomplete = (e) => {
-    const query = e.target.value.toLowerCase();
-    setValue(query);
-    if (query.length > 2) {
-      const debouncedFilter = debounce(() => {
-        //console.log("====>", query);
-        let l = `${URL_AUTOCOMPLETE}${query}`;
-        const fetchHandler = async () => {
-          return await Axios.get(l).then((res) => res.data);
-        };
-        fetchHandler().then((data) => setListOfPersons(data));
-        console.log(listOfPersons);
-
-      }, 600);
-      debouncedFilter();
-    } else {
-      setSuggestionsActive(false);
-    }
-  };
-
-
   const handleChangeAge = (event) => {
     setAge(event.target.value);
   };
@@ -100,11 +74,15 @@ const AddPersonForm = () => {
       .integer()
       .min(1000, "Nieprawidłowy rok")
       .max(2100, "Nieprawidłowy rok"),
+    birthyearone: Yup.number()
+      .integer()
+      .min(1000, "Nieprawidłowy rok")
+      .max(2100, "Nieprawidłowy rok"),
     birthyeartwo: Yup.number()
       .integer()
       .min(1000, "Nieprawidłowy rok")
       .max(2100, "Nieprawidłowy rok")
-      .moreThan(Yup.ref("birthyear"), "Data jest późniejsza niż pierwsza data"),
+      .moreThan(Yup.ref("birthyearone"), "Data jest późniejsza niż pierwsza data"),
 
     birthplace: Yup.string()
       .matches(/^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to prawidłowa nazwa?")
@@ -137,12 +115,41 @@ const AddPersonForm = () => {
       birthyeartwo: "",
       birthplace: "",
       birthpar: "",
+      fatherName: "",
+      father: "",
+      motherName: "",
+      mother:"",
     },
     validationSchema: schema,
     onSubmit: async (values, actions) => {
       console.log(values);
-      /* 
-      await  Axios.post(`${URL}persons`, values, {
+      
+      const fullname = `${values.name} ${values.surname}`
+      let fullnameMarried;
+      values.surnameMarried ? fullnameMarried = `${values.name} ${values.surnameMarried}` : fullnameMarried = `${values.name} ${values.surname}`
+      
+      /*   
+      await  Axios.post(`${URL}persons`, {
+        gender: values.gender,
+        name: values.name,
+        surname: values.surname,
+        surnameMarried: values.surnameMarried,
+        fullname: fullname,
+        fullnameMarried: fullnameMarried,
+        nobility: values.nobility,
+        profession: values.profession,
+        age: values.age,
+        birthday: values.birthday,
+        birthmonth: values.birthmonth,
+        birthyear: values.birthyear,
+        birthyeartwo: values.birthyeartwo,
+        birthplace: values.birthplace,
+        birthpar: values.birthpar,
+        fatherName: values.fatherName,
+        father: values.father,
+        motherName: values.motherName,
+        mother: values.mother,
+      }, {
         "headers": {
           "content-type": "application/json",
         }
@@ -152,7 +159,7 @@ const AddPersonForm = () => {
       }).catch(function (error) {
         console.log(error.response);
       });
-       */
+ */
     },
   });
 
@@ -175,26 +182,26 @@ const AddPersonForm = () => {
             <Grid item xs={12} sm={12}>
               <FormControl>
                 <RadioGroup
-                  row
                   aria-labelledby="demo-row-radio-buttons-group-label"
                   name="gender"
-                  onChange={handleChange}
                   onBlur={handleBlur}
+                  onChange={handleChange}
+                  row
                 >
                   <FormControlLabel
-                    value="female"
                     control={<Radio />}
                     label="Kobieta"
+                    value="female"
                   />
                   <FormControlLabel
-                    value="male"
                     control={<Radio />}
                     label="Mężczyzna"
+                    value="male"
                   />
                   <FormControlLabel
-                    value="other"
                     control={<Radio />}
                     label="Nieznany"
+                    value="other"
                   />
                 </RadioGroup>
               </FormControl>
@@ -207,14 +214,13 @@ const AddPersonForm = () => {
 
             <Grid item xs={12} sm={6}>
               <TextField
-                autoComplete="name"
-                name="name"
+                autoFocus
                 fullWidth
                 id="name"
                 label="Imię / imiona"
-                onChange={handleChange}
+                name="name"
                 onBlur={handleBlur}
-                autoFocus
+                onChange={handleChange}
               />
               {touched.name && errors.name ? (
                 <Alert sx={{ width: "100%" }} severity="error">
@@ -228,9 +234,8 @@ const AddPersonForm = () => {
                 id="surname"
                 label="Nazwisko"
                 name="surname"
-                autoComplete="surname"
-                onChange={handleChange}
                 onBlur={handleBlur}
+                onChange={handleChange}
               />
               {touched.surname && errors.surname ? (
                 <Alert sx={{ width: "100%" }} severity="error">
@@ -245,9 +250,8 @@ const AddPersonForm = () => {
                 id="surnameMarried"
                 label="Nazwisko po ślubie"
                 name="surnameMarried"
-                autoComplete="surnameMarried"
-                onChange={handleChange}
                 onBlur={handleBlur}
+                onChange={handleChange}
               />
               {touched.surnameMarried && errors.surnameMarried ? (
                 <Alert sx={{ width: "100%" }} severity="error">
@@ -257,13 +261,12 @@ const AddPersonForm = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                autoComplete="nobility"
-                name="nobility"
                 fullWidth
                 id="nobility"
                 label="Tytuł"
-                onChange={handleChange}
+                name="nobility"
                 onBlur={handleBlur}
+                onChange={handleChange}
               />
               {touched.nobility && errors.nobility ? (
                 <Alert sx={{ width: "100%" }} severity="error">
@@ -277,9 +280,8 @@ const AddPersonForm = () => {
                 id="profession"
                 label="Zawód"
                 name="profession"
-                autoComplete="profession"
-                onChange={handleChange}
                 onBlur={handleBlur}
+                onChange={handleChange}
               />
               {touched.profession && errors.profession ? (
                 <Alert sx={{ width: "100%" }} severity="error">
@@ -297,10 +299,10 @@ const AddPersonForm = () => {
             <Grid item xs={12} sm={12}
               sx={{
                 borderTop: "solid 1px #aaa",
-                textAlign: "right",
                 marginLeft: "16px",
                 marginBottom: "0px",
                 paddingBottom: "0px",
+                textAlign: "right",
               }}
             ></Grid>
 
@@ -310,16 +312,16 @@ const AddPersonForm = () => {
                   <FormControl fullWidth>
                     <InputLabel id="du-select-label">Data urodzenia</InputLabel>
                     <Select
-                      labelId="du-select-label"
                       id="du-simple-select"
-                      value={isAge}
+                      labelId="du-select-label"
                       label="Age"
                       name="age"
+                      onBlur={handleBlur}
                       onChange={(e) => {
                         handleChangeAge(e);
                         handleChange(e);
                       }}
-                      onBlur={handleBlur}
+                      value={isAge}
                     >
                       <MenuItem value={1}>Dokładnie</MenuItem>
                       <MenuItem value={2}>Od... do...</MenuItem>
@@ -331,10 +333,9 @@ const AddPersonForm = () => {
                     <Grid item xs={6} sm={6}>
                       <TextField
                         fullWidth
-                        id="birthyear"
+                        id="birthyearone"
                         label="Rok"
-                        name="birthyear"
-                        autoComplete="birthyear"
+                        name="birthyearone"
                         onChange={handleChange}
                       />
                     </Grid>
@@ -354,16 +355,16 @@ const AddPersonForm = () => {
                       <FormControl fullWidth>
                         <InputLabel id="label-day">Dzień</InputLabel>
                         <Select
-                          labelId="label-day"
                           id="select-day"
+                          labelId="label-day"
                           label="Dzień"
                           name="birthday"
-                          value={isBirthday}
+                          onBlur={handleBlur}
                           onChange={(e) => {
                             handleChangeBirthDay(e);
                             handleChange(e);
                           }}
-                          onBlur={handleBlur}
+                          value={isBirthday}
                         >
                           {days.map((day, key) => (
                             <MenuItem key={key} value={day}>
@@ -377,16 +378,16 @@ const AddPersonForm = () => {
                       <FormControl fullWidth>
                         <InputLabel id="label-month">Miesiąc</InputLabel>
                         <Select
-                          labelId="label-month"
                           id="select-month"
-                          value={isBirthmonth}
+                          labelId="label-month"
                           label="Miesiąc"
                           name="birthmonth"
+                          onBlur={handleBlur}
                           onChange={(e) => {
                             handleChangeBirthMonth(e);
                             handleChange(e);
                           }}
-                          onBlur={handleBlur}
+                          value={isBirthmonth}
                         >
                           {months.map((month, key) => (
                             <MenuItem key={month.month} value={month.number}>
@@ -402,19 +403,26 @@ const AddPersonForm = () => {
                         id="birthyear"
                         label="Rok"
                         name="birthyear"
-                        autoComplete="birthyear"
                         onChange={handleChange}
                       />
                     </Grid>
                   </>
                 )}
-
                 {touched.birthyear && errors.birthyear ? (
                   <Alert
                     sx={{ width: "100%", marginTop: "10px" }}
                     severity="error"
                   >
                     {errors.birthyear}
+                  </Alert>
+                ) : null}
+
+                {touched.birthyearone && errors.birthyearone ? (
+                  <Alert
+                    sx={{ width: "100%", marginTop: "10px" }}
+                    severity="error"
+                  >
+                    {errors.birthyearone}
                   </Alert>
                 ) : null}
                 {touched.birthyeartwo && errors.birthyeartwo ? (
@@ -436,9 +444,8 @@ const AddPersonForm = () => {
                     id="birthplace"
                     label="Miejsce urodzenia"
                     name="birthplace"
-                    autoComplete="birthplace"
-                    onChange={handleChange}
                     onBlur={handleBlur}
+                    onChange={handleChange}
                   />
                   {touched.birthplace && errors.birthplace ? (
                     <Alert sx={{ width: "100%" }} severity="error">
@@ -452,9 +459,8 @@ const AddPersonForm = () => {
                     id="birthpar"
                     label="Parafia"
                     name="birthpar"
-                    autoComplete="birthpar"
-                    onChange={handleChange}
                     onBlur={handleBlur}
+                    onChange={handleChange}
                   />
                   {touched.birthpar && errors.birthpar ? (
                     <Alert sx={{ width: "100%" }} severity="error">
@@ -473,37 +479,33 @@ const AddPersonForm = () => {
             <Grid item xs={12} sm={12}
               sx={{
                 borderTop: "solid 1px #aaa",
-                textAlign: "right",
                 marginLeft: "16px",
                 marginBottom: "0px",
                 paddingBottom: "0px",
+                textAlign: "right",
               }}
             ></Grid>          
 
             <Grid item xs={12} sm={6}>
-              <TextField
-                name="fatherName"
-                fullWidth
+              <TextFieldAutocompleteFather
+                apiLink = {URL}
                 id="fatherName"
                 label="Imię i nazwisko ojca"
-                onChange={(e) => {
-                  handleChange(e);
-                  handleChangeAutocomplete(e);
-                }}
-                onBlur={handleBlur}
-              />
-              
+                name="fatherName"
+                onBlur= {handleBlur}
+                onChange={ handleChange}
+               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
+              <TextFieldAutocompleteMother
+                apiLink = {URL}
                 id="motherName"
                 label="Imię i nazwisko matki"
                 name="motherName"
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              
+            
             </Grid>
           </Grid>
           
@@ -516,10 +518,10 @@ const AddPersonForm = () => {
             <Grid item xs={12} sm={12}
               sx={{
                 borderTop: "solid 1px #aaa",
-                textAlign: "right",
                 marginLeft: "16px",
                 marginBottom: "0px",
                 paddingBottom: "0px",
+                textAlign: "right",
               }}
             ></Grid> 
             <Grid
