@@ -17,3 +17,4 @@ export const months = [
     { month: "listopada", number: 11 },
     { month: "grudnia", number: 12 },
   ];
+

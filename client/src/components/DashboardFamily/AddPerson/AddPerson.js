@@ -3,7 +3,8 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
-import AddPersonForm from '../../Forms/AddPersonForm';
+import AddPersonForm from './Form/AddPersonForm';
+//import AddPersonForm from '../../Forms/AddPersonForm';
 import FamilyHeader from "../FamilyHeader";
 
 const AddPerson = () => {
