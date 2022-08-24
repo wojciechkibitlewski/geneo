@@ -52,5 +52,4 @@ const AddPerson = () => {
     </main>
   )
 }
-
 export default AddPerson
