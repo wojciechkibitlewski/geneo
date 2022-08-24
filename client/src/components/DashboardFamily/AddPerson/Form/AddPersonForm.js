@@ -1,5 +1,8 @@
 import React from "react";
 import { useState } from "react";
+import Axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
@@ -19,6 +22,8 @@ import { TextFieldAutocompleteFather, TextFieldAutocompleteMother } from "./Text
 
 import { days, months } from "../../../config/functions"
 
+const URL = process.env.REACT_APP_API_BASE_URL;
+
 const INITIAL_FORM_STATE = {
   gender: "",
   name: "",
@@ -30,6 +35,7 @@ const INITIAL_FORM_STATE = {
   birthday: "",
   birthmonth: "",
   birthyear: "",
+  birthyearone: "",
   birthyeartwo: "",
   birthplace: "",
   birthpar: "",
@@ -86,16 +92,61 @@ const FORM_VALIDATION = Yup.object().shape({
     .max(60, "Maksymalnie 60 znaków"),
 });
 
-const onSubmit = async (values, actions) => {
-  console.log(values)
-};
+
 
 
 const AddPersonForm = () => {
+  const navigate = useNavigate();
+
+  const onSubmit = async (values, actions) => {
+   
+    const fullname = values.name.concat(' ', values.surname);
+    const fullnameMarried = values.name.concat(' ', values.surnameMarried);
+    const father = values.father.match(/^[0-9a-fA-F]{24}$/)
+    const mother = values.mother.match(/^[0-9a-fA-F]{24}$/)
+    const birthyear = !values.birthyearone ? values.birthyear : values.birthyearone 
+
+    
+    await  Axios.post(`${URL}persons`, {
+      gender: values.gender,
+        name: values.name,
+        surname: values.surname,
+        surnameMarried: values.surnameMarried,
+        fullname: fullname,
+        fullnameMarried: fullnameMarried,
+        nobility: values.nobility,
+        profession: values.profession,
+        age: values.age,
+        birthday: values.birthday,
+        birthmonth: values.birthmonth,
+        birthyear: birthyear,
+        birthyeartwo: values.birthyeartwo,
+        birthplace: values.birthplace,
+        birthpar: values.birthpar,
+        fatherName: values.fatherName,
+        father: father,
+        motherName: values.motherName,
+        mother: mother,
+        info: values.info,
+    }, 
+      {
+      "headers": {
+        "content-type": "application/json",
+      }
+    }).then(function (response) {
+      navigate("/family/listpersons")
+      //console.log(response);
+    }).catch(function (error) {
+      console.log(error.response);
+    });
+      
+  
+  };
   const [isAge, setAge] = useState("");
   const [isBirthday, setBirthDay] = useState("");
   const [isBirthmonth, setBirthMonth] = useState("");
 
+  
 
   const handleChangeAge = (event) => {
     setAge(event.target.value);
@@ -106,6 +157,8 @@ const AddPersonForm = () => {
   const handleChangeBirthMonth = (event) => {
     setBirthMonth(event.target.value);
   };
+
+  
 
   return (
     <Box
@@ -334,7 +387,17 @@ const AddPersonForm = () => {
               </Grid>
 
             </Grid>
-
+            <Grid item xs={12} sm={12}
+                sx={{
+                  borderTop: "solid 1px #aaa",
+                  marginLeft: "16px",
+                  marginTop: "20px",
+                  paddingTop: "20px",
+                  marginBottom: "0px",
+                  paddingBottom: "0px",
+                  textAlign: "right",
+                }}
+              ></Grid>
               <Grid item xs={12} sm={12} sx={{textAlign:"right"}}>
                 <Button variant="outlined" color="error" size="large">
                   Wyczyść

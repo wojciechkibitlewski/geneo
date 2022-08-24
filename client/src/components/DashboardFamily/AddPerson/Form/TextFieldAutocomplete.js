@@ -10,6 +10,7 @@ import ListItem from "@mui/material/ListItem";
 
 const URL = process.env.REACT_APP_API_BASE_URL;
 
+
 export const TextFieldAutocompleteFather = ({ name, ...props }) => {
   const [field, meta] = useField(name);
   const { setFieldValue } = useFormikContext();
@@ -94,6 +95,8 @@ export const TextFieldAutocompleteFather = ({ name, ...props }) => {
       <TextField
         autoComplete="off"
         fullWidth
+        label = {props.label}
+        name = {props.name}
         value={isValue}
         onChange={handleChangePerson}
       />
@@ -186,7 +189,10 @@ export const TextFieldAutocompleteMother = ({ name, ...props }) => {
       <TextField
         autoComplete="off"
         fullWidth
+        label = {props.label}
+        name = {props.name}
         value={isValue}
+
         onChange={handleChangePerson}
       />
       {suggestionsActive && <SuggestionsCopy />}

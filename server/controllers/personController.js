@@ -24,8 +24,17 @@ const getAllPersons = asyncHandler( async(req,res) => {
 
 const createNewPerson = asyncHandler( async(req,res) => {
     
-    const {gender, name, surname, surnameMarried, fullname, fullnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, father, mother, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
-    const personObj = {gender, name, surname, surnameMarried, fullname, fullnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, father, mother, living, age2, deathday, deathmonth, deathyear, deathplace, info }
+    const {gender, name, surname, surnameMarried, fullname, fullnameMarried, 
+        nobility, profession, 
+        age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, 
+        fatherName, father, motherName, mother,  
+        info } = req.body
+
+    const personObj = {gender, name, surname, surnameMarried, fullname, fullnameMarried, 
+        nobility, profession, 
+        age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, 
+        fatherName, father, motherName, mother, 
+        info }
     
     const person = await Person.create(personObj);
     if(person) {
@@ -33,28 +42,6 @@ const createNewPerson = asyncHandler( async(req,res) => {
     } else {
         res.status(400).json({message: 'Invalid person data received'})
     }
-
-
-    /* 
-    const {name, surname, birthyear, birth, birthplace, birthpar, deathyear, death, deathplace, deathpar, father, mother, akt, info} = req.body
-    
-    const duplicate = await Person.findOne({
-        name: name, surname: surname, birth: birth, father: father, mother: mother 
-    }).lean().exec()
-    if (duplicate) {
-        return res.status(409).json( {message: 'Duplicate person'})
-    }
-    
-    const personObj = {name, surname, birthyear, birth, birthplace, birthpar, deathyear, death, deathplace, deathpar, father, mother, akt, info}
-
-    //create and store person
-    const person = await Person.create(personObj);
-    if(person) {
-        res.status(201).json( {message: `New person ${name} ${surname} created`})
-    } else {
-        res.status(400).json({message: 'Invalid person data received'})
-    }
-     */
 })
 
 // @desc Update persons

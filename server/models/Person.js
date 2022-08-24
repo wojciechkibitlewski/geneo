@@ -31,13 +31,8 @@ const personSchema = new mongoose.Schema({
         require: false,
         ref: "Person",
     },
-    living: String,
-    age2: String,
-    deathday: Number,
-    deathmonth: Number,
-    deathyear: Number,
-    deathplace: String,
-    info: String,  
-})
+    
+}
+);
 
 module.exports = mongoose.model('Person', personSchema)
