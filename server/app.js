@@ -13,6 +13,7 @@ const app = express();
 const {logger} = require('./middleware/logger');
 const errorHandler = require('./middleware/errorHandler');
 const corsOptions = require('./config/corsOptions');
+
 const connectDb = require('./config/dbConnect');
 const {logEvents} = require('./middleware/logger');
 
@@ -25,6 +26,7 @@ app.use(cookieParse());
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/', require('./routers/root'));
+
 app.use('/persons', require('./routers/personRouters'));
 app.use('/suggest', require('./routers/suggestRouters'));
 

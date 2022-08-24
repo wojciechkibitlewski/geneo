@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-
+import GoogleIcon from '@mui/icons-material/Google';
 
 const LoginForm = () => {
   const handleSubmit = (event) => {
@@ -66,6 +66,15 @@ const LoginForm = () => {
             >
               Zaloguj się
             </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              sx={{ mt: 1, mb: 2 }}
+              name="googleauth"
+            >
+              <GoogleIcon sx={{mr:2}} /> Zaloguj się przez Google
+            </Button>
+
             <Grid container>
               <Grid item xs>
                 <Link href="lostpassword" variant="body2">

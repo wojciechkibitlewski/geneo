@@ -1,11 +1,11 @@
 import React from 'react'
-import SignUpForm from '../Forms/SignUpForm';
+import RegisterForm from '../Forms/RegisterForm';
 
 
 const Register = () => {
   return (
     <main className='splash'>
-        <SignUpForm />
+        <RegisterForm />
     </main>
   )
 }
