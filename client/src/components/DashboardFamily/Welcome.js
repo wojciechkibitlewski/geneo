@@ -1,9 +1,16 @@
 import React from 'react'
+import { useContext } from "react";
+
+import AuthContext from "../../context/AuthProvider";
+
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import FamilyHeader from "./FamilyHeader";
 
 const Welcome = () => {
+  const {auth} = useContext(AuthContext);
+
+  console.log(auth)
   return (
     <main>
       <div className="tlo"></div>

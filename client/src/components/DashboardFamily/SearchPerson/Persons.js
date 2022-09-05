@@ -16,7 +16,7 @@ import Paper from "@mui/material/Paper";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import { styled } from "@mui/material/styles";
 
-import TablePaginationActions from "./TablePaginationActions";
+import TablePaginationActions from "../Tables/TablePaginationActions";
 
 
 TablePaginationActions.propTypes = {
@@ -25,102 +25,6 @@ TablePaginationActions.propTypes = {
   page: PropTypes.number.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
 };
-
-function createData(
-  id,
-  birthyear,
-  birthdate,
-  deathdate,
-  name,
-  surname,
-  fathername,
-  mothername,
-  mothersurname,
-  birthplace,
-  birthpar
-) {
-  return {
-    id,
-    birthyear,
-    birthdate,
-    deathdate,
-    name,
-    surname,
-    fathername,
-    mothername,
-    mothersurname,
-    birthplace,
-    birthpar,
-  };
-}
-
-const rows = [
-  createData(
-    "123657694352",
-    "1764",
-    "",
-    "",
-    "Mateusz",
-    "Grzeszczyk",
-    "",
-    "",
-    "",
-    "",
-    ""
-  ),
-  createData(
-    "746253846947",
-    "1803",
-    "12.04.1803",
-    "",
-    "Andrzej",
-    "Grzeszczyk",
-    "Jan",
-    "Anna",
-    "Kamińska",
-    "Sidorówka",
-    "Jeleniewo"
-  ),
-  createData(
-    "253433586765",
-    "1807",
-    "12.04.1807",
-    "",
-    "Marcin",
-    "Grzeszczyk",
-    "Mateusz",
-    "Zuzanna",
-    "Zalewska",
-    "Zusno",
-    "Filipów"
-  ),
-  createData(
-    "958472615493",
-    "1808",
-    "12.04.1808",
-    "12.04.1808",
-    "Marianna",
-    "Grzeszczyk",
-    "Mateusz",
-    "Zuzanna",
-    "Zalewska",
-    "Zusno",
-    "Filipów"
-  ),
-  createData(
-    "675652438593",
-    "1810",
-    "",
-    "",
-    "Anna",
-    "Grzeszczyk",
-    "Jan",
-    "Anna",
-    "Kamińska",
-    "Sidorówka",
-    "Jeleniewo"
-  ),
-];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -151,12 +55,15 @@ const fetchHandler = async () => {
 const ListPersons = () => {
   
   const [listOfPersons, setListOfPersons] = useState([]);
+  
   useEffect(() => {
     fetchHandler().then((data) => setListOfPersons(data));
   }, []);
+  
+  
 
-  console.log(listOfPersons)
-
+  //console.log(listOfPersons)
+  const rows = listOfPersons;
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -182,9 +89,8 @@ const ListPersons = () => {
             <TableCell>Rok urodzenia</TableCell>
             <TableCell>Imię</TableCell>
             <TableCell>Nazwisko</TableCell>
-            <TableCell>Imię ojca</TableCell>
-            <TableCell>Imię matki</TableCell>
-            <TableCell>Nazwisko matki</TableCell>
+            <TableCell>Imię i nazwisko ojca</TableCell>
+            <TableCell>Imię i nazwisko matki</TableCell>
             <TableCell>Miejscowość urodzenia</TableCell>
             <TableCell>Parafia</TableCell>
             <TableCell>Więcej</TableCell>
@@ -201,14 +107,27 @@ const ListPersons = () => {
               </StyledTableCell>
               <StyledTableCell>{row.name}</StyledTableCell>
               <StyledTableCell>{row.surname}</StyledTableCell>
-              <StyledTableCell>{row.fathername}</StyledTableCell>
-              <StyledTableCell>{row.mothername}</StyledTableCell>
-              <StyledTableCell>{row.mothersurname}</StyledTableCell>
+              <StyledTableCell>
+                <Link
+                  to={`/family/searchpersons/${row.father}`}
+                  title={row.fatherName}
+                >
+                {row.fatherName}
+                </Link>
+                </StyledTableCell>
+              <StyledTableCell>
+                <Link
+                  to={`/family/searchpersons/${row.mother}`}
+                  title={row.motherName}
+                >
+                {row.motherName}
+                </Link>
+              </StyledTableCell>
               <StyledTableCell>{row.birthplace}</StyledTableCell>
               <StyledTableCell>{row.birthpar}</StyledTableCell>
               <StyledTableCell>
                 <Link
-                  to={`/family/searchpersons/${row.id}`}
+                  to={`/family/searchpersons/${row._id}`}
                   title="Zobacz więcej"
                 >
                   <ContactPageIcon sx={{ color: "#000" }} />
@@ -223,10 +142,10 @@ const ListPersons = () => {
           )}
         </TableBody>
         <TableFooter>
-          <TableRow>
+          <TableRow >
             <TablePagination
               rowsPerPageOptions={[10, 20, 50, { label: "All", value: -1 }]}
-              colSpan={3}
+              colSpan={8}
               count={rows.length}
               rowsPerPage={rowsPerPage}
               page={page}

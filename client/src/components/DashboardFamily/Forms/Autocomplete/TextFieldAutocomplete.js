@@ -10,13 +10,12 @@ import ListItem from "@mui/material/ListItem";
 
 const URL = process.env.REACT_APP_API_BASE_URL;
 
+
 export const TextFieldAutocompleteFather = ({ name, ...props }) => {
   const [field, meta] = useField(name);
   const { setFieldValue } = useFormikContext();
 
-  const [isValue, setIsValue] = useState("");
-  const [valueId, setValueId] = useState("");
-  const [fatherName, setFatherName] = useState("");
+  const [formValues, setFormValues] = useState('');
 
   const [suggestionsActive, setSuggestionsActive] = useState(false);
   const [filteredPersonsCopy, setFilteredPersonsCopy] = useState([]);
@@ -27,6 +26,7 @@ export const TextFieldAutocompleteFather = ({ name, ...props }) => {
     ...props,
     fullWidth: true,
   };
+  
   if (meta && meta.touched && meta.error) {
     configTextfield.error = true;
     configTextfield.helperText = meta.error;
@@ -35,7 +35,6 @@ export const TextFieldAutocompleteFather = ({ name, ...props }) => {
   ///
   const handleChangePerson = (e) => {
     let query = e.target.value;
-    setIsValue(query);
     setFieldValue(name, query);
     query = e.target.value.toLowerCase();
 
@@ -48,7 +47,6 @@ export const TextFieldAutocompleteFather = ({ name, ...props }) => {
           return await Axios.get(l).then((res) => res.data);
         };
         fetchHandler().then((data) => setListOfPersons(data));
-        //console.log(listOfPersons)
 
         setFilteredPersonsCopy(
           listOfPersons.filter(
@@ -64,19 +62,20 @@ export const TextFieldAutocompleteFather = ({ name, ...props }) => {
     } else {
       setSuggestionsActive(false);
     }
+    setFieldValue("nFatherName", '');
+    setFieldValue("father", '');
   };
 
   const handleClickSuggest = (e) => {
     const personId = e.target.getAttribute("data-index");
     const personFathername = e.target.getAttribute("data-index-m");
-
+    
+    setFormValues(e.target.innerText);
     setFieldValue(name, e.target.innerText);
+    setFieldValue("nFatherName", personFathername);
     setFieldValue("father", personId);
-    setFieldValue("fatherName", personFathername);
     setFilteredPersonsCopy([]);
-    setIsValue(e.target.innerText);
-    setFatherName(personFathername);
-
+    
     setSuggestionsActive(false);
   };
 
@@ -99,17 +98,16 @@ export const TextFieldAutocompleteFather = ({ name, ...props }) => {
   };
   return (
     <>
-      <TextField
+      <TextField key={formValues}
+        {...configTextfield}
         autoComplete="off"
-        fullWidth
-        label = {props.label}
-        name = {props.name}
-        value={isValue}
         onChange={handleChangePerson}
+        InputLabelProps={{
+          shrink: true,
+        }}
       />
       {suggestionsActive && <SuggestionsCopy />}
-      <input type="text" name="father" value={valueId} hidden readOnly />
-      <input type="text" name="fatherName" value={fatherName} hidden readOnly />
+
     </>
   );
 };
@@ -120,12 +118,9 @@ export const TextFieldAutocompleteMother = ({ name, ...props }) => {
   const [field, meta] = useField(name);
   const { setFieldValue } = useFormikContext();
 
-  const [isValue, setIsValue] = useState("");
-  const [valueId, setValueId] = useState("");
-  const [motherName, setMotherName] = useState("");
+  const [formValues, setFormValues] = useState('');
 
   const [suggestionsActive, setSuggestionsActive] = useState(false);
-
   const [filteredPersonsCopy, setFilteredPersonsCopy] = useState([]);
   const [listOfPersons, setListOfPersons] = useState([]);
 
@@ -134,14 +129,15 @@ export const TextFieldAutocompleteMother = ({ name, ...props }) => {
     ...props,
     fullWidth: true,
   };
+  
   if (meta && meta.touched && meta.error) {
     configTextfield.error = true;
     configTextfield.helperText = meta.error;
   }
-  //
+
+  ///
   const handleChangePerson = (e) => {
     let query = e.target.value;
-    setIsValue(query);
     setFieldValue(name, query);
     query = e.target.value.toLowerCase();
 
@@ -154,33 +150,35 @@ export const TextFieldAutocompleteMother = ({ name, ...props }) => {
           return await Axios.get(l).then((res) => res.data);
         };
         fetchHandler().then((data) => setListOfPersons(data));
-        //console.log(listOfPersons);
 
         setFilteredPersonsCopy(
-          listOfPersons.filter((personsCopy) =>
-            personsCopy.fullname.toLowerCase().includes(query.toLowerCase())
+          listOfPersons.filter(
+            (personsCopy) =>
+              personsCopy.fullname.toLowerCase().includes(query.toLowerCase())
+            //personsCopy => personsCopy.fullname.toLowerCase().includes(query.toLowerCase())
           )
         );
-        
+       
         setSuggestionsActive(true);
       }, 500);
       doPersonFilter(query);
     } else {
       setSuggestionsActive(false);
     }
+    setFieldValue("nMotherName", '');
+    setFieldValue("mother", '');
   };
 
-  const handleClick = (e) => {
+  const handleClickSuggest = (e) => {
     const personId = e.target.getAttribute("data-index");
     const personMotherName = e.target.getAttribute("data-index-m");
-
+    
+    setFormValues(e.target.innerText);
     setFieldValue(name, e.target.innerText);
+    setFieldValue("nMotherName", personMotherName);
     setFieldValue("mother", personId);
-    setFieldValue("motherName", personMotherName);
     setFilteredPersonsCopy([]);
-    setIsValue(e.target.innerText);
-    setValueId(personId);
-    setMotherName(personMotherName);
+    
     setSuggestionsActive(false);
   };
 
@@ -192,7 +190,7 @@ export const TextFieldAutocompleteMother = ({ name, ...props }) => {
             key={index}
             data-index={p._id}
             data-index-m = {p.fullname}
-            onClick={handleClick}
+            onClick={handleClickSuggest}
             sx={{ cursor: "pointer" }}
           >
             {p.fullname}, ur. {p.birthyear}, {p.birthplace}
@@ -203,18 +201,16 @@ export const TextFieldAutocompleteMother = ({ name, ...props }) => {
   };
   return (
     <>
-      <TextField
+      <TextField key={formValues}
+        {...configTextfield}
         autoComplete="off"
-        fullWidth
-        label = {props.label}
-        name = {props.name}
-        value={isValue}
-
         onChange={handleChangePerson}
+        InputLabelProps={{
+          shrink: true,
+        }}
       />
       {suggestionsActive && <SuggestionsCopy />}
-      <input type="text" name="mother" value={valueId} hidden readOnly />
-      <input type="text" name="motherName" value={motherName} hidden readOnly />
+
     </>
   );
 };

@@ -1,15 +1,54 @@
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
+const Promise = require("bluebird");
+const _ = require("lodash"); 
 
 const Person = require('../models/Person');
 const Wedding = require('../models/Wedding');
 
+// @desc Get person
+// @route GET /persons/:id
+// @access Private
+
+const getPerson = asyncHandler( async(req,res) => {
+    /* 
+    potrzebuję:
+    [x] wszystkie dane z kolekcji Person
+    [x] imiona i nazwiska rodziców (wyciągniete na podstawie mother i father)
+    - małżeństwo - oddzielna kolekcja
+    - dzieci (wyciągniete na podstawie mother i father, tylko w drugą stronę)
+    Wszystko przekazane w jednym zapytaniu
+
+    */
+   
+    const person = await Person.findById(req.params.id)
+        .populate({ path: 'father', select: 'fullname age birthday birthmonth birthyear birthyeartwo birthplace birthpar' })
+        .populate({ path: 'mother', select: 'fullname age birthday birthmonth birthyear birthyeartwo birthplace birthpar' })
+        .exec()
+
+    if(!person) {
+        return res.status(400).json( {message: 'Person not found'})
+    } 
+        
+    const kidsPerson = await Person.find( {$or:[ {father: person._id}, {mother: person._id} ] }, 'fullname age birthday birthmonth birthyear birthyeartwo birthplace birthpar' ).exec()
+     
+    const k = {
+        kids: kidsPerson
+    };
+    
+    const r = {...person._doc, ...k};
+
+    res.json(r);
+    
+    
+})
 // @desc Get all users
 // @route GET /users
 // @access Private
 
 const getAllPersons = asyncHandler( async(req,res) => {
-    const persons = await Person.find()
+    const {editor } = req.body;
+    const persons = await Person.find(editor)
     .limit(20)
     .lean()
     if(!persons?.length) {
@@ -49,7 +88,11 @@ const createNewPerson = asyncHandler( async(req,res) => {
 // @access Private
 
 const updatePerson = asyncHandler( async(req,res) => {
-    const {id, gender, name, surname, surnameMarried, fullname, fullnameMarried, nobility, profession, age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, father, mother, living, age2, deathday, deathmonth, deathyear, deathplace, info } = req.body
+    const {id, gender, name, surname, surnameMarried, fullname, fullnameMarried, nobility, profession, 
+        age, birthday, birthmonth, birthyear, birthyeartwo, birthplace, birthpar, link, 
+        father, fatherName, mother, motherName, 
+        living, age2, deathday, deathmonth, deathyear, deathplace, deathlink,
+        info } = req.body
     
     const person = await Person.findById(id).exec()
     if(!person) {
@@ -70,54 +113,28 @@ const updatePerson = asyncHandler( async(req,res) => {
     person.birthyeartwo = birthyeartwo
     person.birthplace = birthplace
     person.birthpar = birthpar
+    person.link = link 
+
+    
     person.father = father
+    person.fatherName = fatherName
     person.mother = mother
+    person.motherName = motherName
+
     person.living = living
     person.age2 = age2
     person.deathday = deathday
     person.deathmonth = deathmonth
     person.deathyear = deathyear
     person.deathplace = deathplace
+    person.deathlink = deathlink 
 
     person.info = info 
 
     const updatePerson = await person.save()
     res.json({ message: `${updatePerson.name} ${updatePerson.surname} updated`})
     
-    /* const {id, name, surname, birthyear, birth, birthplace, birthpar, deathyear, death, deathplace, deathpar, father, mother, akt, info} = req.body
-
-    const person = await Person.findById(id).exec()
-    if(!person) {
-        return res.status(400).json( {message: 'Person not found'})
-    }
-
-    // check for duplicate
-    const duplicate = await Person.findOne({
-        name: name, surname: surname, birth: birth, father: father, mother: mother 
-    }).lean().exec()
-    // allow update to the orginal user
-    if (duplicate && duplicate?._id.toString() !== id) {
-        return res.status(409).json( {message: 'Duplicate person name and surname'})
-    }
-
-    person.name = name
-    person.surname = surname 
-    person.birthyear = birthyear
-    person.birth = birth
-    person.birthplace = birthplace
-    person.birthpar = birthpar
-    person.deathyear = deathyear
-    person.death = death
-    person.deathplace = deathplace
-    person.deathpar = deathpar
-    person.father = father
-    person.mother = mother
-    person.akt = akt
-    person.info = info
     
-    const updatePerson = await person.save()
-    res.json({ message: `${updatePerson.name} ${updatePerson.surname} updated`})
- */
 })
 
 // @desc Delete a person
@@ -151,5 +168,6 @@ module.exports = {
     getAllPersons,
     createNewPerson,
     updatePerson,
-    deletePerson
+    deletePerson,
+    getPerson
 }

@@ -20,7 +20,6 @@ const dataPages = [
   { link: "/family/addperson", title: "Dodaj osobę do bazy" },
   { link: "/family/searchpersons", title: "Szukaj osób" },
   { link: "/family/listpersons", title: "Twoje odkrycia" },
-  { link: "/family/tree", title: "Twoje drzewo genealogiczne" },
 ];
 
 const settings = ["Profil", "Wyloguj się"];

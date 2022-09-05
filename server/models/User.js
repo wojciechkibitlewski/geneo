@@ -1,7 +1,11 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-    username: {
+    name: {
+        type: String,
+        require: true
+    },
+    surname: {
         type: String,
         require: true
     },

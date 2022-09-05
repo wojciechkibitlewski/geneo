@@ -31,6 +31,12 @@ const personSchema = new mongoose.Schema({
         require: false,
         ref: "Person",
     },
+    editor: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: "6310bdbbcc6d48e63272dbd0"
+    },
+    info: String,
+    link: String
     
 }
 );

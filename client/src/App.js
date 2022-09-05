@@ -18,6 +18,7 @@ import Welcome from "./components/DashboardFamily/Welcome";
 import Public from "./components/Public/Public";
 import PublicLayout from "./components/PublicLayout/PublicLayout";
 import DisplayPerson from "./components/DashboardFamily/DisplayPerson/DisplayPerson";
+import EditPerson from './components/DashboardFamily/EditPerson/EditPerson';
 
 const theme = createTheme();
 
@@ -41,6 +42,8 @@ function App() {
             <Route path="listpersons" element={<ListPersons />} />
             <Route path="searchpersons" element={<SearchPersons />} />
             <Route path="searchpersons/:id" element={<DisplayPerson />} />
+            <Route path="editpersons/:id" element={<EditPerson />} />
+
             <Route path="tree" element={<Tree />} />
           </Route>
         </Routes>

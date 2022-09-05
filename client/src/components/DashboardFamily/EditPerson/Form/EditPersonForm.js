@@ -1,8 +1,5 @@
 import React from "react";
-import { useState } from "react";
-import Axios from "axios";
-import { useNavigate } from "react-router-dom";
-
+import { useState} from "react";
 
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
@@ -22,141 +19,58 @@ import { TextFieldAutocompleteFather, TextFieldAutocompleteMother } from "./Text
 
 import { days, months } from "../../../config/functions"
 
-const URL = process.env.REACT_APP_API_BASE_URL;
+const AddPersonForm = (props) => {
 
-const INITIAL_FORM_STATE = {
-  gender: "",
-  name: "",
-  surname: "",
-  surnameMarried: "",
-  nobility: "",
-  profession: "",
-  age: 1,
-  birthday: "",
-  birthmonth: "",
-  birthyear: "",
-  birthyearone: "",
-  birthyeartwo: "",
-  birthplace: "",
-  birthpar: "",
-  fatherName: "",
-  father: "",
-  motherName: "",
-  mother: "",
-  link: "",
-  info: "",
-};
+  const validationSchema = Yup.object().shape({
+    gender: Yup.string().required("Pole wymagane"),
+    name: Yup.string()
+      .matches(/^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to prawidłowe imię?")
+      .max(60, "Maksymalnie 60 znaków"),
+    surname: Yup.string()
+      .matches(
+        /^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/,
+        "Czy to prawidłowe nazwisko?"
+      )
+      .max(60, "Maksymalnie 60 znaków"),
+    surnameMarried: Yup.string()
+      .matches(
+        /^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/,
+        "Czy to prawidłowe nazwisko?"
+      )
+      .max(60, "Maksymalnie 60 znaków"),
+    nobility: Yup.string()
+      .matches(/^([a-zA-Z0-9ęółśążźćńĘÓŁŚĄŻŹĆŃ.]\s*)+$/, "Czy to poprawne dane?")
+      .max(40, "Maksymalnie 40 znaków"),
+    profession: Yup.string()
+      .matches(/^([a-zA-Z0-9ęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to poprawne dane?")
+      .max(40, "Maksymalnie 40 znaków"),
+    birthyear: Yup.number()
+      .integer()
+      .min(1000, "Nieprawidłowy rok")
+      .max(2100, "Nieprawidłowy rok"),
+    birthyearone: Yup.number()
+      .integer()
+      .min(1000, "Nieprawidłowy rok")
+      .max(2100, "Nieprawidłowy rok"),
+    birthyeartwo: Yup.number()
+      .integer()
+      .min(1000, "Nieprawidłowy rok")
+      .max(2100, "Nieprawidłowy rok")
+      .moreThan(
+        Yup.ref("birthyearone"),
+        "Data jest późniejsza niż pierwsza data"
+      ),
+    birthplace: Yup.string()
+      .matches(/^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to prawidłowa nazwa?")
+      .max(60, "Maksymalnie 60 znaków"),
+    birthpar: Yup.string()
+      .matches(/^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to prawidłowa nazwa?")
+      .max(60, "Maksymalnie 60 znaków"),
+  });
 
-const FORM_VALIDATION = Yup.object().shape({
-  gender: Yup.string().required("Pole wymagane"),
-  name: Yup.string()
-    .matches(/^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to prawidłowe imię?")
-    .max(60, "Maksymalnie 60 znaków"),
-  surname: Yup.string()
-    .matches(
-      /^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/,
-      "Czy to prawidłowe nazwisko?"
-    )
-    .max(60, "Maksymalnie 60 znaków"),
-  surnameMarried: Yup.string()
-    .matches(
-      /^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/,
-      "Czy to prawidłowe nazwisko?"
-    )
-    .max(60, "Maksymalnie 60 znaków"),
-  nobility: Yup.string()
-    .matches(/^([a-zA-Z0-9ęółśążźćńĘÓŁŚĄŻŹĆŃ.]\s*)+$/, "Czy to poprawne dane?")
-    .max(40, "Maksymalnie 40 znaków"),
-  profession: Yup.string()
-    .matches(/^([a-zA-Z0-9ęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to poprawne dane?")
-    .max(40, "Maksymalnie 40 znaków"),
-  birthyear: Yup.number()
-    .integer()
-    .min(1000, "Nieprawidłowy rok")
-    .max(2100, "Nieprawidłowy rok"),
-  birthyearone: Yup.number()
-    .integer()
-    .min(1000, "Nieprawidłowy rok")
-    .max(2100, "Nieprawidłowy rok"),
-  birthyeartwo: Yup.number()
-    .integer()
-    .min(1000, "Nieprawidłowy rok")
-    .max(2100, "Nieprawidłowy rok")
-    .moreThan(
-      Yup.ref("birthyearone"),
-      "Data jest późniejsza niż pierwsza data"
-    ),
-  birthplace: Yup.string()
-    .matches(/^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to prawidłowa nazwa?")
-    .max(60, "Maksymalnie 60 znaków"),
-  birthpar: Yup.string()
-    .matches(/^([a-zA-ZęółśążźćńĘÓŁŚĄŻŹĆŃ]\s*)+$/, "Czy to prawidłowa nazwa?")
-    .max(60, "Maksymalnie 60 znaków"),
-});
-
-
-
-
-const AddPersonForm = () => {
-  const navigate = useNavigate();
-
-  const onSubmit = async (values, actions) => {
-   
-    let fullname = values.name.concat(' ', values.surname);
-    
-    let fullnameMarried = '';
-    if(values.surnameMarried !=='') {
-      fullnameMarried = values.name.concat(' ', values.surnameMarried);
-      fullname = values.name.concat(' ', values.surnameMarried);
-      
-    }
-    const father = values.father.match(/^[0-9a-fA-F]{24}$/)
-    const mother = values.mother.match(/^[0-9a-fA-F]{24}$/)
-    const birthyear = !values.birthyearone ? values.birthyear : values.birthyearone 
-
-    
-    await  Axios.post(`${URL}persons`, {
-        gender: values.gender,
-        name: values.name,
-        surname: values.surname,
-        surnameMarried: values.surnameMarried,
-        fullname: fullname,
-        fullnameMarried: fullnameMarried,
-        nobility: values.nobility,
-        profession: values.profession,
-        age: values.age,
-        birthday: values.birthday,
-        birthmonth: values.birthmonth,
-        birthyear: birthyear,
-        birthyeartwo: values.birthyeartwo,
-        birthplace: values.birthplace,
-        birthpar: values.birthpar,
-        fatherName: values.fatherName,
-        father: father,
-        motherName: values.motherName,
-        mother: mother,
-        link: values.link,
-        info: values.info,
-    }, 
-      {
-      "headers": {
-        "content-type": "application/json",
-      }
-    }).then(function (response) {
-      navigate("/family/listpersons")
-      //console.log(response);
-    }).catch(function (error) {
-      console.log(error.response);
-    });
-      
-  
-  };
-  
   const [isAge, setAge] = useState("");
   const [isBirthday, setBirthDay] = useState("");
   const [isBirthmonth, setBirthMonth] = useState("");
-
-  
 
   const handleChangeAge = (event) => {
     setAge(event.target.value);
@@ -167,8 +81,6 @@ const AddPersonForm = () => {
   const handleChangeBirthMonth = (event) => {
     setBirthMonth(event.target.value);
   };
-
-  
 
   return (
     <Box
@@ -184,9 +96,8 @@ const AddPersonForm = () => {
         }}
       >
      <Formik
-       initialValues={{ ...INITIAL_FORM_STATE}}
-       validationSchema={FORM_VALIDATION}
-       onSubmit={onSubmit}
+       enableReinitialize={true}
+       {...props} validationSchema={validationSchema}
      >
        {props => (
          <Form onSubmit={props.handleSubmit} >
@@ -198,6 +109,7 @@ const AddPersonForm = () => {
                 <TextfieldWrapper 
                   label="Imię / imiona"
                   name="name"
+                  
                 />
               </Grid>
               <Grid item xs={12} sm={6}  sx={{padding: "10px"}}>

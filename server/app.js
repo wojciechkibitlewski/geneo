@@ -6,29 +6,38 @@ const mongoose = require('mongoose');
 const cookieParse = require('cookie-parser');
 const cors = require('cors');
 
-const PORT = process.env.PORT || 3500;
-
-const app = express();
-
 const {logger} = require('./middleware/logger');
+const credentials = require('./middleware/credentials');
 const errorHandler = require('./middleware/errorHandler');
 const corsOptions = require('./config/corsOptions');
-
 const connectDb = require('./config/dbConnect');
 const {logEvents} = require('./middleware/logger');
+const verifyJWT = require('./middleware/verifyJWT');
 
 connectDb();
 
+const PORT = process.env.PORT || 3500;
+const app = express();
+
 app.use(logger);
+app.use(credentials);
 app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: false}));
 app.use(express.json());
 app.use(cookieParse());
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/', require('./routers/root'));
 
+app.use('/register', require('./routers/registerRouters'));
+app.use('/auth', require('./routers/authRouters'));
+app.use('/refresh', require('./routers/refreshRouters'));
+app.use('/logout', require('./routers/logoutRouters'));
+
+//app.use(verifyJWT);
 app.use('/persons', require('./routers/personRouters'));
 app.use('/suggest', require('./routers/suggestRouters'));
+
 
 app.all('*', (req,res) => {
     res.status(404)
