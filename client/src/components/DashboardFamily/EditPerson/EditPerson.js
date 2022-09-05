@@ -39,7 +39,8 @@ const EditPerson = (props) => {
   
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log(e);
+    console.log(e.target);
+    //console.log(values);
     /* 
     let fullname = values.name.concat(' ', values.surname);
     
@@ -159,9 +160,7 @@ const EditPerson = (props) => {
               borderRadius: "10px",
               border: "solid 1px #aaa",
             }}
-            >
-              
-              
+            > 
               <FormPerson 
               initialValues={formValues}
               onSubmit={onSubmit}

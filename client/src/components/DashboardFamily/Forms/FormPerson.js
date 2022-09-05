@@ -78,9 +78,8 @@ export const FormPerson = (props) => {
     <Formik 
     {...props} 
     validationSchema={validationSchema} 
-    onSubmit={props.onSubmit}
     >
-    <Form onSubmit={props.handleSubmit}>
+    <Form onSubmit={props.onSubmit}>
         <Grid container spacing={0}>
             <Grid data-name="gender" item xs={12} sm={12}  sx={{padding: "10px"}}>
 
